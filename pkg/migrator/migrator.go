@@ -90,7 +90,7 @@ func Migrate(c *model.Cache, targetRoot, home, user string, dryRun bool) error {
 	case model.StrategyDocker:
 		return migrateDocker(c)
 	case model.StrategySystemd:
-		return migrateSystemd(c)
+		return migrateSystemd(c, home)
 	case model.StrategySymlink:
 		return migrateSymlink(c)
 	default:
@@ -174,7 +174,7 @@ func migrateDocker(c *model.Cache) error {
 }
 
 // migrateSystemd 修改 ollama.service 并提示重启
-func migrateSystemd(c *model.Cache) error {
+func migrateSystemd(c *model.Cache, home string) error {
 	if err := moveDir(c.CurrentPath, c.TargetPath); err != nil {
 		return err
 	}
@@ -208,6 +208,17 @@ func migrateSystemd(c *model.Cache) error {
 
 	exec.Command("systemctl", "daemon-reload").Run()
 	fmt.Println("  已更新 /etc/systemd/system/ollama.service")
+
+	// 同时写入 shell profile，让当前/新终端和 cache-migrator scan 都能识别
+	profiles, err := shellProfiles(home)
+	if err == nil {
+		line := fmt.Sprintf("export OLLAMA_MODELS=%s", c.TargetPath)
+		for _, p := range profiles {
+			_ = appendUniqueLine(p, line)
+		}
+		fmt.Printf("  已写入 OLLAMA_MODELS 到 %s\n", strings.Join(profiles, ", "))
+	}
+
 	fmt.Println("  请手动执行: systemctl restart ollama")
 	return nil
 }

@@ -87,13 +87,37 @@ func (s *Scanner) scanDocker(c *model.Cache) {
 	}
 }
 
-// scanOllama 检查 OLLAMA_MODELS 环境变量，否则 ~/.ollama/models
+// scanOllama 检查 OLLAMA_MODELS 环境变量 / systemd 服务 / ~/.ollama/models
 func (s *Scanner) scanOllama(c *model.Cache) {
 	if v := s.env("OLLAMA_MODELS"); v != "" {
 		c.CurrentPath = v
 		return
 	}
+	if v := ollamaModelsFromSystemd(); v != "" {
+		c.CurrentPath = v
+		return
+	}
 	c.CurrentPath = filepath.Join(s.home, ".ollama", "models")
+}
+
+// ollamaModelsFromSystemd 从 ollama.service 中解析 OLLAMA_MODELS
+func ollamaModelsFromSystemd() string {
+	data, err := os.ReadFile("/etc/systemd/system/ollama.service")
+	if err != nil {
+		return ""
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "Environment=") {
+			continue
+		}
+		line = strings.TrimPrefix(line, "Environment=")
+		line = strings.Trim(line, `"`)
+		if strings.HasPrefix(line, "OLLAMA_MODELS=") {
+			return strings.TrimPrefix(line, "OLLAMA_MODELS=")
+		}
+	}
+	return ""
 }
 
 // scanNpm 使用 npm config get cache
