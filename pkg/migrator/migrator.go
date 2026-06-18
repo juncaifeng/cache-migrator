@@ -273,7 +273,9 @@ func copyFile(src, dst string, mode os.FileMode) error {
 	}
 	defer out.Close()
 
-	_, err = io.Copy(out, in)
+	// 使用 1MB 缓冲区提升大文件跨设备复制速度
+	buf := make([]byte, 1024*1024)
+	_, err = io.CopyBuffer(out, in, buf)
 	return err
 }
 
