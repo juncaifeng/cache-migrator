@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"example.com/cache-migrator/pkg/disk"
-	"example.com/cache-migrator/pkg/migrator"
-	"example.com/cache-migrator/pkg/model"
-	"example.com/cache-migrator/pkg/prompt"
-	"example.com/cache-migrator/pkg/scanner"
+	"github.com/juncaifeng/cache-migrator/pkg/disk"
+	"github.com/juncaifeng/cache-migrator/pkg/migrator"
+	"github.com/juncaifeng/cache-migrator/pkg/model"
+	"github.com/juncaifeng/cache-migrator/pkg/prompt"
+	"github.com/juncaifeng/cache-migrator/pkg/scanner"
 )
 
 func main() {

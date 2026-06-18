@@ -6,9 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"syscall"
 
-	"example.com/cache-migrator/pkg/model"
+	"github.com/juncaifeng/cache-migrator/pkg/model"
 )
 
 // List 读取 /proc/mounts 中真实的块设备挂载点，并返回可用空间
@@ -43,23 +42,13 @@ func List() ([]model.Disk, error) {
 		}
 		seen[mount] = true
 
-		var stat syscall.Statfs_t
-		if err := syscall.Statfs(mount, &stat); err != nil {
+		d, err := statDisk(mount)
+		if err != nil {
 			continue
 		}
-
-		total := stat.Blocks * uint64(stat.Bsize)
-		free := stat.Bavail * uint64(stat.Bsize)
-		used := total - free
-
-		disks = append(disks, model.Disk{
-			Device:     device,
-			MountPoint: mount,
-			Total:      total,
-			Free:       free,
-			Used:       used,
-			FSType:     fstype,
-		})
+		d.Device = device
+		d.FSType = fstype
+		disks = append(disks, d)
 	}
 
 	if err := scanner.Err(); err != nil {

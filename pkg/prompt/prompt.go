@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"example.com/cache-migrator/pkg/model"
+	"github.com/juncaifeng/cache-migrator/pkg/model"
 )
 
 var stdin = bufio.NewReader(os.Stdin)

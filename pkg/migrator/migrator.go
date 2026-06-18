@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"example.com/cache-migrator/pkg/model"
+	"github.com/juncaifeng/cache-migrator/pkg/model"
 )
 
 // targetPathFor 根据缓存类型、目标根目录和用户生成合理的目标路径

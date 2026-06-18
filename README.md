@@ -34,11 +34,33 @@ Docker、Ollama 模型、npm/Go/Rust 缓存默认都放在家目录或 `/var/lib
 
 ## 安装
 
+### 方式一：一行命令安装（推荐）
+
+从 GitHub Release 下载最新二进制并安装到 `/usr/local/bin`：
+
 ```bash
+curl -fsSL https://raw.githubusercontent.com/juncaifeng/cache-migrator/master/install.sh | bash
+```
+
+指定版本：
+
+```bash
+VERSION=v1.0.0 curl -fsSL https://raw.githubusercontent.com/juncaifeng/cache-migrator/master/install.sh | bash
+```
+
+### 方式二：`go install`
+
+```bash
+go install github.com/juncaifeng/cache-migrator@latest
+```
+
+### 方式三：手动编译
+
+```bash
+git clone https://github.com/juncaifeng/cache-migrator.git
 cd cache-migrator
-go build -o cache-migrator .
-# 可选：放到 PATH
-sudo cp cache-migrator /usr/local/bin/
+make build
+sudo make install
 ```
 
 纯标准库实现，无需下载任何 Go 模块依赖。
@@ -108,6 +130,30 @@ sudo ./cache-migrator migrate --target /mnt/data --user wxchy
 - 迁移前会先检测目标路径是否已存在，避免覆盖。
 - 如果缓存已经在目标盘下，会自动跳过。
 - 跨文件系统迁移时使用“复制 + 删除源目录”策略，复制失败不会删除源数据。
+
+## 分发 / Release
+
+本项目使用 GitHub Actions 自动构建和发布：
+
+- 每次 `push` 到 `master` 会触发 [Build](.github/workflows/build.yml) 工作流，编译并上传产物。
+- 推送 `v*` 标签（如 `v1.0.0`）会触发 [Release](.github/workflows/release.yml) 工作流，自动生成 Release 并上传跨平台二进制。
+
+本地打包：
+
+```bash
+make cross
+ls dist/
+```
+
+会生成：
+
+```text
+cache-migrator-linux-amd64
+cache-migrator-linux-arm64
+cache-migrator-darwin-amd64
+cache-migrator-darwin-arm64
+cache-migrator-windows-amd64.exe
+```
 
 ## 项目结构
 

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"example.com/cache-migrator/pkg/model"
+	"github.com/juncaifeng/cache-migrator/pkg/model"
 )
 
 // Scanner 保存一次扫描的上下文
